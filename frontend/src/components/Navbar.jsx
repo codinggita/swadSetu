@@ -12,7 +12,7 @@ const Navbar = () => {
           <a href="#" className="text-sm font-medium text-text-light opacity-90 hover:opacity-100 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:height-[2px] after:bg-primary text-primary">Menu</a>
           <a href="#" className="text-sm font-medium text-text-light opacity-90 hover:opacity-100">Artisans</a>
           <a href="#" className="text-sm font-medium text-text-light opacity-90 hover:opacity-100">Our Story</a>
-          <a href="#" className="text-sm font-medium text-text-light opacity-90 hover:opacity-100">Subscription</a>
+          <Link to="/subscriptions" className="text-sm font-medium text-text-light opacity-90 hover:opacity-100">Subscription</Link>
         </div>
         <div className="flex items-center gap-5">
           <a href="#" className="text-text-light text-xl flex items-center justify-center"><ShoppingBag size={20} /></a>

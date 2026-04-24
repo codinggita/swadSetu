@@ -84,22 +84,22 @@ Extras: Firebase (auth), Razorpay (payments), AI suggestions
 
 ---
 
-## 📁 Frontend Folder Structure
+## 📁 Project Structure
 
 ```text
 swadSetu/
-├── public/               # Static assets
-├── src/
-│   ├── assets/           # Images, icons, and fonts
-│   ├── components/       # Reusable UI components
-│   ├── pages/            # Application routes/pages
-│   ├── utils/            # Helper functions and utilities
-│   ├── App.jsx           # Main application entry component
-│   ├── main.jsx          # React DOM render and context providers
-│   └── index.css         # Global styles and design system
-├── index.html            # Main HTML template
-├── package.json          # Project metadata and scripts
-└── vite.config.js        # Vite configuration
+├── frontend/             # All frontend-related files
+│   ├── public/           # Static assets
+│   ├── src/
+│   │   ├── assets/       # Images, icons, and fonts
+│   │   ├── components/   # Reusable UI components (Flat)
+│   │   ├── pages/        # Application routes/pages
+│   │   ├── App.jsx       # Main application entry
+│   │   └── index.css     # Tailwind v4 & global styles
+│   ├── index.html        # Main HTML template
+│   ├── package.json      # Dependencies and scripts
+│   └── vite.config.js    # Vite configuration
+└── README.md             # Project documentation
 ```
 
 ---
@@ -131,9 +131,19 @@ Signup → Choose Plan → Select Centers → Set Preferences → Customize Meal
 
 ## 🛠️ Setup
 
-git clone https://github.com/sumit22102006/swadSetu.git
-npm install
-npm run dev
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sumit22102006/swadSetu.git
+   ```
+2. Navigate to the frontend directory:
+   ```bash
+   cd swadSetu/frontend
+   ```
+3. Install dependencies and start:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 ---
 

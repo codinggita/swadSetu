@@ -1,6 +1,6 @@
 import React from 'react';
-import DashboardHeader from '../components/dashboard/DashboardHeader';
-import Sidebar from '../components/dashboard/Sidebar';
+import DashboardHeader from '../components/DashboardHeader';
+import Sidebar from '../components/Sidebar';
 import { Star, MessageSquare, History } from 'lucide-react';
 
 const Dashboard = () => {

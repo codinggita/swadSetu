@@ -1,6 +1,6 @@
 import React from 'react';
 import { Recycle, Truck } from 'lucide-react';
-import tiffinImg from '../../assets/Screenshot 2026-04-24 125513.png';
+import tiffinImg from '../assets/Screenshot 2026-04-24 125513.png';
 
 const ZeroWaste = () => {
   return (
