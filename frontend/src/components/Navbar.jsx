@@ -11,7 +11,9 @@ const Navbar = () => {
           <li><a href="#" className="text-white opacity-80 hover:opacity-100 hover:text-primary transition-all text-sm font-medium">Artisans</a></li>
           <li><a href="#" className="text-white opacity-80 hover:opacity-100 hover:text-primary transition-all text-sm font-medium">Our Story</a></li>
           <li><a href="#" className="text-white opacity-80 hover:opacity-100 hover:text-primary transition-all text-sm font-medium">Subscription</a></li>
+          <li><Link to="/support" className="text-white opacity-80 hover:opacity-100 hover:text-primary transition-all text-sm font-medium">Support</Link></li>
         </ul>
+
         <div className="flex items-center gap-5">
           <a href="#" className="text-white hover:text-primary transition-all">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
