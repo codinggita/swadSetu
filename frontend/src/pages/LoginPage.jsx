@@ -1,29 +1,26 @@
 import React, { useState } from 'react';
-import signupBg from '../assets/signup-bg.png';
 import { Link, useNavigate } from 'react-router-dom';
+import signupBg from '../assets/signup-bg.png';
 
-const SignupPage = () => {
-  const [name, setName] = useState('');
+const LoginPage = () => {
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/users', {
+      const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, phone, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -31,14 +28,14 @@ const SignupPage = () => {
       if (response.ok) {
         // Save user data and token to localStorage
         localStorage.setItem('userInfo', JSON.stringify(data));
-        // Redirect to dashboard on successful signup
+        // Redirect to dashboard
         navigate('/dashboard');
       } else {
-        setError(data.message || 'Signup failed. Please try again.');
+        setError(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
       setError('An error occurred while connecting to the server.');
-      console.error('Signup error:', err);
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -64,8 +61,8 @@ const SignupPage = () => {
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-15">
         <div className="w-full max-w-[400px]">
-          <h1 className="text-3xl font-bold mb-2 text-secondary">Join the table</h1>
-          <p className="text-sm text-text-light mb-10">Create your account to start your culinary journey.</p>
+          <h1 className="text-3xl font-bold mb-2 text-secondary">Welcome back</h1>
+          <p className="text-sm text-text-light mb-10">Log in to continue your culinary journey.</p>
           
           {error && (
             <div className="bg-red-50 text-red-500 p-3 rounded-sm text-sm mb-6 border border-red-200">
@@ -73,19 +70,7 @@ const SignupPage = () => {
             </div>
           )}
           
-          <form className="space-y-5" onSubmit={handleSignup}>
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Full Name</label>
-              <input 
-                type="text" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
+          <form className="space-y-5" onSubmit={handleLogin}>
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Email Address</label>
               <input 
@@ -93,18 +78,6 @@ const SignupPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Phone Number</label>
-              <input 
-                type="tel" 
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 00000 00000" 
                 className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
                 required 
               />
@@ -122,12 +95,18 @@ const SignupPage = () => {
               />
             </div>
             
+            <div className="flex justify-end">
+              <Link to="/forgot-password" className="text-xs text-primary font-medium hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+            
             <button 
               type="submit" 
               disabled={isLoading}
               className="w-full bg-[#f26b1d] text-white p-3.5 rounded-sm text-base font-semibold flex items-center justify-center gap-2 hover:bg-[#e05a10] transition-colors mt-2 cursor-pointer disabled:opacity-70"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'} <span className="text-lg">→</span>
+              {isLoading ? 'Logging in...' : 'Log In'} <span className="text-lg">→</span>
             </button>
           </form>
           
@@ -143,11 +122,11 @@ const SignupPage = () => {
           </button>
           
           <p className="text-center mt-6 text-sm text-text-light">
-            Already have an account? <Link to="/login" className="text-primary font-bold">Log in</Link>
+            Don't have an account? <Link to="/signup" className="text-primary font-bold">Sign up</Link>
           </p>
           
           <footer className="mt-12 text-[11px] text-gray-400 leading-relaxed text-center">
-            By creating an account, you agree to our <Link to="/terms" className="underline hover:text-gray-600">Terms of Service</Link> and <Link to="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>. Artisanal taste, delivered with care.
+            Artisanal taste, delivered with care.
           </footer>
         </div>
       </div>
@@ -155,4 +134,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default LoginPage;
