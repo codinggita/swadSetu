@@ -1,29 +1,122 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Info, 
-  CheckCircle, 
-  Leaf, 
-  Landmark, 
-  ShieldCheck, 
-  Activity, 
-  Flame, 
-  Monitor, 
-  Plus, 
-  X, 
-  Bell, 
-  User,
-  Search,
-  ChevronRight,
-  HandPlatter
+  Info, CheckCircle, Leaf, Landmark, Activity, Flame, Monitor, 
+  Plus, X, Bell, User, HandPlatter, Camera, Edit3, Loader
 } from 'lucide-react';
 
 const ProfilePage = () => {
+  const [user, setUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Edit form state
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState('');
+  
+  const navigate = useNavigate();
+
+  // Preferences state
   const [selectedDiet, setSelectedDiet] = useState('Pure veg');
   const [spiciness, setSpiciness] = useState('Medium');
   const [oilLevel, setOilLevel] = useState(50);
   const [tiffinTime, setTiffinTime] = useState('11am-1pm');
   const [avoidItems, setAvoidItems] = useState(['Peanuts', 'Dairy', 'Shellfish', 'Gluten', 'Mustard', 'Sesame']);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (!userInfo || !userInfo.token) {
+          navigate('/login');
+          return;
+        }
+
+        const res = await fetch('/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+          setEditName(data.name);
+          setEditEmail(data.email);
+          setEditPhone(data.phone || '');
+          setImagePreview(data.profileImage || '');
+        } else {
+          // Token might be expired
+          localStorage.removeItem('userInfo');
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
+
+  const uploadFileHandler = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploadingImage(true);
+
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setImagePreview(data.image);
+      } else {
+        console.error('Image upload failed');
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const submitProfileHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const res = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: JSON.stringify({
+          name: editName,
+          email: editEmail,
+          phone: editPhone,
+          profileImage: imagePreview,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error('Profile update failed', error);
+    }
+  };
 
   const diets = [
     { id: 'Pure veg', icon: <Leaf className="w-5 h-5 text-green-500" />, title: 'Pure veg', desc: 'Strictly vegetarian meals only' },
@@ -37,6 +130,8 @@ const ProfilePage = () => {
   const spicinessLevels = ['No spice', 'Mild', 'Medium', 'Spicy', 'Extra hot'];
   const tiffinTimes = ['Before 11am', '11am-1pm', '1pm-3pm', 'After 3pm'];
 
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]"><Loader className="w-8 h-8 text-orange-500 animate-spin" /></div>;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#0f0f0f] font-sans text-gray-800">
       {/* Navbar */}
@@ -47,14 +142,18 @@ const ProfilePage = () => {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
           <Link to="/" className="hover:text-white transition-colors">Home</Link>
           <Link to="/menu" className="hover:text-white transition-colors">Menu</Link>
-          <Link to="/orders" className="hover:text-white transition-colors">Orders</Link>
+          <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
           <Link to="/profile" className="text-white border-b-2 border-orange-500 pb-1">Profile</Link>
         </div>
         <div className="flex items-center gap-4">
           <button className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-orange-700 transition-colors">Go Premium</button>
           <Bell className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white" />
-          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white cursor-pointer">
-            <User className="w-5 h-5" />
+          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white overflow-hidden cursor-pointer">
+            {user?.profileImage ? (
+              <img src={`/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
+            ) : (
+              <User className="w-5 h-5" />
+            )}
           </div>
         </div>
       </nav>
@@ -63,22 +162,101 @@ const ProfilePage = () => {
       <div className="flex-1 bg-white w-full p-6 md:p-12 shadow-inner">
         <div className="w-full mx-auto max-w-[1600px]">
           
-          {/* Header */}
-          <div className="flex justify-between items-start mb-6">
+          {/* Personal Information Section */}
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-8 mb-10 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-200/40 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+            
+            <div className="relative z-10 w-32 h-32 rounded-full border-4 border-white shadow-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+              {user?.profileImage ? (
+                <img src={`/api${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
+              ) : (
+                <User className="w-12 h-12 text-gray-400" />
+              )}
+            </div>
+            
+            <div className="relative z-10 flex-1 text-center md:text-left">
+              <h1 className="text-3xl font-bold text-gray-900">{user?.name}</h1>
+              <p className="text-gray-600 mt-1">{user?.email}</p>
+              {user?.phone && <p className="text-gray-500 text-sm mt-1">{user.phone}</p>}
+            </div>
+            
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="relative z-10 bg-white border border-gray-200 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2"
+            >
+              <Edit3 className="w-4 h-4" /> Edit Profile
+            </button>
+          </div>
+
+          {/* Edit Profile Modal */}
+          {isEditing && (
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Edit Profile</h2>
+                  <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-gray-600">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <form onSubmit={submitProfileHandler} className="space-y-5">
+                  <div className="flex justify-center mb-6">
+                    <div className="relative group">
+                      <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center overflow-hidden">
+                        {imagePreview ? (
+                          <img src={imagePreview.startsWith('http') ? imagePreview : `/api${imagePreview}`} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.src = imagePreview} />
+                        ) : (
+                          <User className="w-8 h-8 text-gray-400" />
+                        )}
+                      </div>
+                      <label className="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                        {uploadingImage ? (
+                          <Loader className="w-6 h-6 animate-spin mb-1" />
+                        ) : (
+                          <>
+                            <Camera className="w-6 h-6 mb-1" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Change</span>
+                          </>
+                        )}
+                        <input type="file" onChange={uploadFileHandler} className="hidden" accept="image/*" />
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Full Name</label>
+                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none" required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                      <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none" required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone Number</label>
+                      <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 mt-8">
+                    <button type="button" onClick={() => setIsEditing(false)} className="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-50">Cancel</button>
+                    <button type="submit" className="flex-1 py-2.5 bg-orange-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-orange-700">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Preferences Header */}
+          <div className="flex justify-between items-start mb-6 border-t border-gray-100 pt-10">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My preferences</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Dietary Preferences</h1>
               <p className="text-gray-500 text-sm mt-1">These global settings apply to all your delivery centers automatically.</p>
             </div>
             <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-green-700 text-xs font-semibold">All centers synced</span>
             </div>
-          </div>
-
-          {/* Warning Banner */}
-          <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 mb-8 flex items-center gap-3">
-            <Info className="w-5 h-5 text-orange-500 shrink-0" />
-            <p className="text-orange-800 text-sm font-medium">Changes made here will take effect from your next scheduled delivery.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -89,7 +267,7 @@ const ProfilePage = () => {
                   <h2 className="text-lg font-semibold text-gray-900">What do you eat?</h2>
                   <p className="text-gray-500 text-xs">Applied to all centers</p>
                 </div>
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-md">Veg selected</span>
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-md">{selectedDiet} selected</span>
               </div>
 
               <div className="space-y-3">
@@ -198,13 +376,13 @@ const ProfilePage = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Things to avoid</h2>
             <div className="flex flex-wrap gap-2">
               {avoidItems.map((item) => (
-                <div key={item} className="flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-1.5 rounded-md border border-orange-100 text-xs font-semibold">
-                  {item}
-                  <X 
-                    className="w-3 h-3 cursor-pointer hover:text-orange-900" 
-                    onClick={() => setAvoidItems(avoidItems.filter(i => i !== item))}
-                  />
-                </div>
+               <div key={item} className="flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-1.5 rounded-md border border-orange-100 text-xs font-semibold">
+                 {item}
+                 <X 
+                   className="w-3 h-3 cursor-pointer hover:text-orange-900" 
+                   onClick={() => setAvoidItems(avoidItems.filter(i => i !== item))}
+                 />
+               </div>
               ))}
               <button className="flex items-center gap-2 bg-white border border-dashed border-gray-300 px-4 py-1.5 rounded-md text-xs font-semibold text-gray-500 hover:border-gray-400 hover:text-gray-600">
                 <Plus className="w-3 h-3" />
@@ -213,25 +391,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Bottom Validation Banner */}
-          <div className="mt-8 bg-green-50 border border-green-100 rounded-lg p-4 flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
-              <p className="text-green-800 text-sm font-medium">All your nutritional preferences are currently validated for your region.</p>
-            </div>
-            <Link to="/nutrition" className="text-green-700 text-xs font-bold underline decoration-2 underline-offset-4 hover:text-green-800 transition-colors">
-              View nutritional breakdown
-            </Link>
-          </div>
-
-          {/* Footer Actions */}
           <div className="mt-10 flex items-center justify-end gap-4">
-            <button className="text-gray-500 text-sm font-semibold hover:text-gray-700 transition-colors mr-auto">
-              Reset to default
-            </button>
-            <button className="border border-orange-500 text-orange-600 px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-orange-50 transition-all">
-              Preview changes
-            </button>
             <button className="bg-orange-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all">
               Save preferences
             </button>

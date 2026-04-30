@@ -15,6 +15,8 @@ export const authUser = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        profileImage: user.profileImage,
         token: generateToken(user._id),
       });
     } else {
@@ -31,7 +33,7 @@ export const authUser = async (req, res, next) => {
 // @access  Public
 export const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -44,6 +46,7 @@ export const registerUser = async (req, res, next) => {
       name,
       email,
       password,
+      phone,
     });
 
     if (user) {
@@ -51,6 +54,8 @@ export const registerUser = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        profileImage: user.profileImage,
         token: generateToken(user._id),
       });
     } else {
@@ -74,6 +79,44 @@ export const getUserProfile = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        profileImage: user.profileImage,
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+export const updateUserProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+      user.profileImage = req.body.profileImage || user.profileImage;
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        profileImage: updatedUser.profileImage,
+        token: generateToken(updatedUser._id),
       });
     } else {
       res.status(404);
