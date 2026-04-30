@@ -52,9 +52,9 @@ const DashboardPage = () => {
                 </ul>
               </div>
             </div>
-            <div className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
+            <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
               <User className="w-5 h-5" />
-            </div>
+            </Link>
           </div>
         </header>
 
