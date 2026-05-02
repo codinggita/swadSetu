@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
+import api from '../services/api';
 
 const SupportPage = () => {
   const [openFaq, setOpenFaq] = useState(0);
@@ -101,20 +102,50 @@ const SupportPage = () => {
         {/* Contact Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {[
-            { icon: MessageSquare, title: "Live Chat", sub: "Available 8 AM - 9 PM daily for instant resolution.", color: "text-orange-600", bg: "bg-orange-50", action: "Chat Now" },
-            { icon: Phone, title: "Call Us", sub: "Urgent delivery issue? Call our center direct line.", color: "text-green-600", bg: "bg-green-50", action: "Dial +1-800-SWAD" },
-            { icon: Mail, title: "Send Email", sub: "For billing inquiries or plan changes anytime.", color: "text-blue-600", bg: "bg-blue-50", action: "Email Support" }
+            { 
+              icon: MessageSquare, 
+              title: "Live Chat", 
+              sub: "Available 8 AM - 9 PM daily for instant resolution.", 
+              color: "text-orange-600", 
+              bg: "bg-orange-50", 
+              action: "Chat Now",
+              link: "https://wa.me/918809839939" 
+            },
+            { 
+              icon: Phone, 
+              title: "Call Us", 
+              sub: "Urgent delivery issue? Call our center direct line.", 
+              color: "text-green-600", 
+              bg: "bg-green-50", 
+              action: "Dial +91 8809839939",
+              link: "tel:+918809839939" 
+            },
+            { 
+              icon: Mail, 
+              title: "Send Email", 
+              sub: "For billing inquiries or plan changes anytime.", 
+              color: "text-blue-600", 
+              bg: "bg-blue-50", 
+              action: "Email Support",
+              link: "https://mail.google.com/mail/?view=cm&fs=1&to=sumit.m.kumar.cg@gmail.com" 
+            }
           ].map((card, i) => (
-            <div key={i} className="bg-white dark:bg-gray-900 p-10 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-800 flex flex-col items-center text-center group hover:-translate-y-1 transition-all">
+            <a 
+              key={i} 
+              href={card.link}
+              target="_blank"
+              rel="noreferrer"
+              className="bg-white dark:bg-gray-900 p-10 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-800 flex flex-col items-center text-center group hover:-translate-y-1 transition-all no-underline"
+            >
               <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                 <card.icon size={28} />
               </div>
               <h3 className="font-black text-xl mb-3 text-gray-900 dark:text-white transition-colors">{card.title}</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 font-medium leading-relaxed transition-colors">{card.sub}</p>
-              <button className={`${card.color} text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all`}>
+              <div className={`${card.color} text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all`}>
                 {card.action} <ChevronRight size={14} />
-              </button>
-            </div>
+              </div>
+            </a>
           ))}
         </div>
 
@@ -176,7 +207,33 @@ const SupportPage = () => {
 
           {/* Sidebar Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800 sticky top-24 transition-colors">
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                
+                try {
+                  const response = await fetch('https://formspree.io/f/mlgabzyj', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'Accept': 'application/json'
+                    }
+                  });
+                  
+                  if (response.ok) {
+                    alert('Your support request has been sent successfully!');
+                    e.target.reset();
+                  } else {
+                    throw new Error('Formspree submission failed');
+                  }
+                } catch (error) {
+                  console.error('Failed to send support request:', error);
+                  alert('Failed to send request. Please try again later or use the "Send Email" card.');
+                }
+              }}
+              className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-gray-200/50 dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800 sticky top-24 transition-colors"
+            >
               <div className="bg-[#121212] dark:bg-[#000000] p-8 text-white relative">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/20 rounded-full blur-2xl"></div>
                 <h3 className="font-black text-xl mb-2 relative z-10">Submit a request</h3>
@@ -185,13 +242,13 @@ const SupportPage = () => {
               <div className="p-8 space-y-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Your Name</label>
-                  <input type="text" placeholder="Arjun Kumar" className="w-full p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-medium outline-none focus:border-orange-500 transition-colors dark:text-white" />
+                  <input name="userName" type="text" placeholder="Arjun Kumar" className="w-full p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-medium outline-none focus:border-orange-500 transition-colors dark:text-white" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Issue Type</label>
                   <div className="relative">
-                    <select className="w-full p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-medium outline-none focus:border-orange-500 appearance-none transition-colors dark:text-white">
-                      <option>Select a category</option>
+                    <select name="issueType" className="w-full p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-medium outline-none focus:border-orange-500 appearance-none transition-colors dark:text-white" required>
+                      <option value="">Select a category</option>
                       <option>Delivery Delay</option>
                       <option>Quality Issue</option>
                       <option>Payment Issue</option>
@@ -203,15 +260,17 @@ const SupportPage = () => {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Description</label>
                   <textarea 
+                    name="description"
                     placeholder="Tell us more about the issue..." 
                     className="w-full p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-medium outline-none focus:border-orange-500 h-32 resize-none transition-colors dark:text-white"
+                    required
                   ></textarea>
                 </div>
-                <button className="w-full bg-orange-600 hover:bg-orange-700 text-white p-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-orange-100 dark:shadow-none transition-all active:scale-[0.98]">
+                <button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white p-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-orange-100 dark:shadow-none transition-all active:scale-[0.98]">
                   Submit Request
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 
