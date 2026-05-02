@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { setCredentials } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
+import api from '../services/api';
 import signupBg from '../assets/signup-bg.png';
 
 const LoginPage = () => {
@@ -28,24 +29,11 @@ const LoginPage = () => {
     dispatch(setLoading(true));
 
     try {
-      const response = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        dispatch(setCredentials(data));
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Login failed. Please check your credentials.');
-      }
+      const { data } = await api.post('/users/login', { email, password });
+      dispatch(setCredentials(data));
+      navigate('/dashboard');
     } catch (err) {
-      setError('An error occurred while connecting to the server.');
+      setError(err.customMessage || 'Login failed. Please check your credentials.');
       console.error('Login error:', err);
     } finally {
       dispatch(setLoading(false));
