@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import Sidebar from '../components/Sidebar';
+import { API_URL } from '../services/api';
 import toast from 'react-hot-toast';
 import SEO from '../components/SEO';
 
@@ -49,7 +50,7 @@ const PreferencesPage = () => {
             <ThemeToggle />
             <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white overflow-hidden cursor-pointer">
               {user?.profileImage ? (
-                <img src={`/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
+                <img src={`${API_URL}/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
               ) : (
                 <User className="w-5 h-5" />
               )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { API_URL } from '../services/api';
 import { MapPin, ChevronLeft, ChevronRight, CalendarX, Plus } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { User, Star } from 'lucide-react';
@@ -139,7 +140,7 @@ const MealPlanPage = () => {
             <ThemeToggle />
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
               {userInfo?.profileImage ? (
-                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-5 h-5" />
               )}

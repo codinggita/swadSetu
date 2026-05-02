@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { API_URL } from '../services/api';
 import { 
   LayoutDashboard, 
   UtensilsCrossed, 
@@ -60,7 +61,7 @@ const Sidebar = () => {
         <Link to="/profile" className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all group">
           <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white overflow-hidden ring-2 ring-transparent group-hover:ring-orange-500/20 transition-all">
             {userInfo?.profileImage ? (
-              <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <User className="w-5 h-5" />
             )}

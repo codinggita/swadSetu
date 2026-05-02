@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Sidebar from '../components/Sidebar';
 import ThemeToggle from '../components/ThemeToggle';
+import { API_URL } from '../services/api';
 import { 
   Bell, 
   User, 
@@ -99,7 +100,7 @@ const DashboardPage = () => {
 
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 dark:ring-gray-700 hover:ring-orange-500/50 transition-all">
               {userInfo?.profileImage ? (
-                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-5 h-5" />
               )}

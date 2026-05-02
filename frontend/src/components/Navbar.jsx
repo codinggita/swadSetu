@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ThemeToggle from './ThemeToggle';
+import { API_URL } from '../services/api';
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -29,7 +30,7 @@ const Navbar = () => {
           </Link>
           <Link to={userInfo ? "/dashboard" : "/login"} className="text-white dark:text-gray-100 hover:text-primary transition-all overflow-hidden rounded-full w-6 h-6 flex items-center justify-center border border-white/20">
             {userInfo?.profileImage ? (
-              <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>

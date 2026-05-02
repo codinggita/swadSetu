@@ -19,6 +19,7 @@ import {
   User
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
+import { API_URL } from '../services/api';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import SEO from '../components/SEO';
@@ -86,7 +87,7 @@ const SupportPage = () => {
             </div>
             <Link to="/profile" className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-white/10 hover:ring-orange-500/50 transition-all">
               {userInfo?.profileImage ? (
-                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-5 h-5" />
               )}
