@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { 
   LayoutDashboard, 
   UtensilsCrossed, 
@@ -11,6 +12,7 @@ import {
 
 const Sidebar = () => {
   const location = useLocation();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
@@ -52,6 +54,23 @@ const Sidebar = () => {
           );
         })}
       </nav>
+
+      {/* User Profile Footer */}
+      <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
+        <Link to="/profile" className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-all group">
+          <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white overflow-hidden ring-2 ring-transparent group-hover:ring-orange-500/20 transition-all">
+            {userInfo?.profileImage ? (
+              <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <User className="w-5 h-5" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userInfo?.name || 'Guest User'}</p>
+            <p className="text-[10px] text-gray-500 font-medium truncate">Premium Member</p>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 };

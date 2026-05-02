@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Sidebar from '../components/Sidebar';
 import ThemeToggle from '../components/ThemeToggle';
 import { 
@@ -18,6 +19,7 @@ import {
 import SEO from '../components/SEO';
 
 const DashboardPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const [isSkipped, setIsSkipped] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [deliveryTime, setDeliveryTime] = useState('1:00 PM');
@@ -96,7 +98,11 @@ const DashboardPage = () => {
             <ThemeToggle />
 
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 dark:ring-gray-700 hover:ring-orange-500/50 transition-all">
-              <User className="w-5 h-5" />
+              {userInfo?.profileImage ? (
+                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
             </Link>
           </div>
         </header>
@@ -107,7 +113,7 @@ const DashboardPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
               <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">
-                {getGreeting()}, Arjun
+                {getGreeting()}, {userInfo?.name?.split(' ')[0] || 'User'}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2 transition-colors">
                 <Clock className="w-4 h-4 text-orange-500" />

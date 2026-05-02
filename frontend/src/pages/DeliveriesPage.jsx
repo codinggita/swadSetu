@@ -76,6 +76,7 @@ const LocationPicker = ({ onLocationSelect }) => {
 const DeliveriesPage = () => {
   const dispatch = useDispatch();
   const { addresses, currentAddress: reduxCurrentAddress } = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.auth);
   
   const [activeTab, setActiveTab] = useState('all');
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -236,7 +237,11 @@ const DeliveriesPage = () => {
             </div>
             <ThemeToggle />
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
-              <User className="w-5 h-5" />
+              {userInfo?.profileImage ? (
+                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
             </Link>
           </div>
         </header>

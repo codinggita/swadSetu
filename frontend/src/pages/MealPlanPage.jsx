@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { MapPin, ChevronLeft, ChevronRight, CalendarX, Plus } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { User, Star } from 'lucide-react';
@@ -7,6 +8,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import SEO from '../components/SEO';
 
 const MealPlanPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const getDaysOfWeek = (baseDate) => {
@@ -136,7 +138,11 @@ const MealPlanPage = () => {
             </div>
             <ThemeToggle />
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
-              <User className="w-5 h-5" />
+              {userInfo?.profileImage ? (
+                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
             </Link>
           </div>
         </header>

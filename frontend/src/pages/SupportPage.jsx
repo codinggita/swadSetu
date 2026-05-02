@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { 
   Search, 
   MessageSquare, 
@@ -13,15 +15,16 @@ import {
   CreditCard,
   Truck,
   Settings,
-  ShieldCheck
+  ShieldCheck,
+  User
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import SEO from '../components/SEO';
 
 const SupportPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const [openFaq, setOpenFaq] = useState(0);
 
   const faqs = [
@@ -81,6 +84,13 @@ const SupportPage = () => {
             <div className="bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full text-[10px] font-bold text-orange-400 uppercase tracking-widest cursor-pointer hover:bg-orange-500/20 transition-all">
               My Tickets
             </div>
+            <Link to="/profile" className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-white/10 hover:ring-orange-500/50 transition-all">
+              {userInfo?.profileImage ? (
+                <img src={`/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
+            </Link>
           </div>
         </div>
 
