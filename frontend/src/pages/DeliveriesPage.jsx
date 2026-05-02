@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import { Search, Loader, ArrowLeft } from 'lucide-react';
+import { addAddress, setCurrentAddress } from '../store/slices/userSlice';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -70,16 +72,15 @@ const LocationPicker = ({ onLocationSelect }) => {
 };
 
 const DeliveriesPage = () => {
+  const dispatch = useDispatch();
+  const { addresses, currentAddress: reduxCurrentAddress } = useSelector((state) => state.user);
+  
   const [activeTab, setActiveTab] = useState('all');
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [addresses, setAddresses] = useState([
-    { id: 1, label: 'Home', address: 'Flat 402, Sunset Heights, Indiranagar, Bangalore 560038' },
-    { id: 2, label: 'Office', address: 'Building 12, Tech Park, Outer Ring Road, Bangalore 560103' },
-    { id: 3, label: 'Gym', address: 'Power Fitness, 12th Main, HAL 2nd Stage, Bangalore 560008' },
-  ]);
 
-  const [currentAddress, setCurrentAddress] = useState(addresses[0]);
+  // Use redux currentAddress if available, otherwise first address as fallback
+  const currentAddress = reduxCurrentAddress || addresses[0];
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ label: '', address: '' });
   const [mapPickerPos, setMapPickerPos] = useState([12.9716, 77.5946]);
@@ -209,8 +210,7 @@ const DeliveriesPage = () => {
       address: newAddress.address
     };
     
-    setAddresses(prev => [...prev, newAddrObj]);
-    setCurrentAddress(newAddrObj);
+    dispatch(addAddress(newAddrObj));
     setIsAddingNewAddress(false);
     setNewAddress({ label: '', address: '' });
   };
@@ -496,7 +496,7 @@ const DeliveriesPage = () => {
                   {addresses.map((addr) => (
                     <div 
                       key={addr.id}
-                      onClick={() => setCurrentAddress(addr)}
+                      onClick={() => dispatch(setCurrentAddress(addr))}
                       className={`p-5 rounded-2xl border-2 transition-all cursor-pointer group ${
                         currentAddress.id === addr.id 
                         ? 'border-orange-500 bg-orange-50' 
