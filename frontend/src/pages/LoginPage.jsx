@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { setCredentials } from '../store/slices/authSlice';
+import { setLoading } from '../store/slices/uiSlice';
 import signupBg from '../assets/signup-bg.png';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { userInfo } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.ui);
+
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       navigate('/dashboard');
     }
-  }, [navigate]);
+  }, [navigate, userInfo]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    dispatch(setLoading(true));
 
     try {
       const response = await fetch('/api/users/login', {
@@ -33,9 +39,7 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save user data and token to localStorage
-        localStorage.setItem('userInfo', JSON.stringify(data));
-        // Redirect to dashboard
+        dispatch(setCredentials(data));
         navigate('/dashboard');
       } else {
         setError(data.message || 'Login failed. Please check your credentials.');
@@ -44,7 +48,7 @@ const LoginPage = () => {
       setError('An error occurred while connecting to the server.');
       console.error('Login error:', err);
     } finally {
-      setIsLoading(false);
+      dispatch(setLoading(false));
     }
   };
 

@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Info, CheckCircle, Leaf, Landmark, Activity, Flame, Monitor, 
   Plus, X, Bell, User, HandPlatter, Camera, Edit3, Loader, Drumstick
 } from 'lucide-react';
+import { setCredentials } from '../store/slices/authSlice';
+import { setLoading } from '../store/slices/uiSlice';
+import { setProfile } from '../store/slices/userSlice';
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+  const { profile: user } = useSelector((state) => state.user);
+  const { isLoading } = useSelector((state) => state.ui);
+  
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   
   // Edit form state
   const [editName, setEditName] = useState('');
@@ -29,12 +36,12 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (!userInfo || !userInfo.token) {
           navigate('/login');
           return;
         }
 
+        dispatch(setLoading(true));
         const res = await fetch('/api/users/profile', {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
@@ -43,25 +50,24 @@ const ProfilePage = () => {
 
         if (res.ok) {
           const data = await res.json();
-          setUser(data);
+          dispatch(setProfile(data));
           setEditName(data.name);
           setEditEmail(data.email);
           setEditPhone(data.phone || '');
           setImagePreview(data.profileImage || '');
         } else {
-          // Token might be expired
-          localStorage.removeItem('userInfo');
+          dispatch(setCredentials(null));
           navigate('/login');
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {
-        setIsLoading(false);
+        dispatch(setLoading(false));
       }
     };
 
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, userInfo, dispatch]);
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
@@ -91,7 +97,6 @@ const ProfilePage = () => {
   const submitProfileHandler = async (e) => {
     e.preventDefault();
     try {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
       const res = await fetch('/api/users/profile', {
         method: 'PUT',
         headers: {
@@ -108,8 +113,8 @@ const ProfilePage = () => {
 
       if (res.ok) {
         const data = await res.json();
-        setUser(data);
-        localStorage.setItem('userInfo', JSON.stringify(data));
+        dispatch(setProfile(data));
+        dispatch(setCredentials({ ...userInfo, ...data }));
         setIsEditing(false);
       }
     } catch (error) {

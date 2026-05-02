@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import signupBg from '../assets/signup-bg.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { setCredentials } from '../store/slices/authSlice';
+import { setLoading } from '../store/slices/uiSlice';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -8,21 +11,23 @@ const SignupPage = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { userInfo } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.ui);
+
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       navigate('/dashboard');
     }
-  }, [navigate]);
+  }, [navigate, userInfo]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    dispatch(setLoading(true));
 
     try {
       const response = await fetch('/api/users', {
@@ -36,9 +41,7 @@ const SignupPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save user data and token to localStorage
-        localStorage.setItem('userInfo', JSON.stringify(data));
-        // Redirect to dashboard on successful signup
+        dispatch(setCredentials(data));
         navigate('/dashboard');
       } else {
         setError(data.message || 'Signup failed. Please try again.');
@@ -47,7 +50,7 @@ const SignupPage = () => {
       setError('An error occurred while connecting to the server.');
       console.error('Signup error:', err);
     } finally {
-      setIsLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
