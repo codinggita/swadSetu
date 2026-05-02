@@ -117,8 +117,15 @@ const ProfilePage = () => {
             <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
             <span className="text-xl font-bold text-white tracking-tight">Your Profile</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <ThemeToggle />
+            <button 
+              onClick={logoutHandler}
+              className="flex items-center gap-2 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-600/20"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout</span>
+            </button>
             <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white overflow-hidden cursor-pointer">
               {user?.profileImage ? (
                 <img src={`${API_URL}/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
@@ -222,25 +229,14 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col md:flex-row gap-4">
-              <div className="flex-1 bg-[#121212] dark:bg-[#000000] rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 transition-colors shadow-2xl">
-                <div>
-                  <h3 className="text-xl font-black tracking-tight mb-1">Upgrade to Premium</h3>
-                  <p className="text-gray-400 text-xs font-medium">Get unlimited meal swaps and priority support.</p>
-                </div>
-                <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group">
-                  Learn More <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </button>
+            {/* Quick Actions */}
+            <div className="mt-8 bg-[#121212] dark:bg-[#000000] rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 transition-colors shadow-2xl">
+              <div>
+                <h3 className="text-xl font-black tracking-tight mb-1">Upgrade to Premium</h3>
+                <p className="text-gray-400 text-xs font-medium">Get unlimited meal swaps, zero delivery fees, and priority support.</p>
               </div>
-              
-              <button 
-                onClick={logoutHandler}
-                className="bg-white dark:bg-gray-900 border border-red-100 dark:border-red-900/30 text-red-600 px-8 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/10 group shadow-sm"
-              >
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <LogOut className="w-5 h-5" />
-                </div>
-                Logout Account
+              <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group">
+                Learn More <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
