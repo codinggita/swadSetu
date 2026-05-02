@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { 
-  User, Camera, Edit3, Loader, X, Mail, Phone, Shield, ExternalLink, MapPin
+  User, Camera, Edit3, Loader, X, Mail, Phone, Shield, ExternalLink, MapPin, LogOut
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import Sidebar from '../components/Sidebar';
-import { setCredentials } from '../store/slices/authSlice';
+import { setCredentials, logout } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
 import { setProfile } from '../store/slices/userSlice';
 import api, { API_URL } from '../services/api';
@@ -15,6 +15,7 @@ import SEO from '../components/SEO';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
   const { profile: user } = useSelector((state) => state.user);
   const { isLoading } = useSelector((state) => state.ui);
@@ -94,6 +95,12 @@ const ProfilePage = () => {
       console.error('Profile update failed', error);
       toast.error(error.response?.data?.message || 'Profile update failed');
     }
+  };
+
+  const logoutHandler = () => {
+    dispatch(logout());
+    navigate('/');
+    toast.success('Logged out successfully');
   };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]"><Loader className="w-8 h-8 text-orange-500 animate-spin" /></div>;
@@ -215,14 +222,25 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="mt-8 bg-[#121212] dark:bg-[#000000] rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 transition-colors shadow-2xl">
-              <div>
-                <h3 className="text-xl font-black tracking-tight mb-1">Upgrade to Premium</h3>
-                <p className="text-gray-400 text-xs font-medium">Get unlimited meal swaps, zero delivery fees, and priority support.</p>
+            <div className="mt-8 flex flex-col md:flex-row gap-4">
+              <div className="flex-1 bg-[#121212] dark:bg-[#000000] rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 transition-colors shadow-2xl">
+                <div>
+                  <h3 className="text-xl font-black tracking-tight mb-1">Upgrade to Premium</h3>
+                  <p className="text-gray-400 text-xs font-medium">Get unlimited meal swaps and priority support.</p>
+                </div>
+                <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group">
+                  Learn More <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-              <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group">
-                Learn More <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              
+              <button 
+                onClick={logoutHandler}
+                className="bg-white dark:bg-gray-900 border border-red-100 dark:border-red-900/30 text-red-600 px-8 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/10 group shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <LogOut className="w-5 h-5" />
+                </div>
+                Logout Account
               </button>
             </div>
           </div>
