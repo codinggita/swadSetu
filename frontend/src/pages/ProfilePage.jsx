@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Info, CheckCircle, Leaf, Landmark, Activity, Flame, Monitor, 
-  Plus, X, Bell, User, HandPlatter, Camera, Edit3, Loader
+  Plus, X, Bell, User, HandPlatter, Camera, Edit3, Loader, Drumstick
 } from 'lucide-react';
 
 const ProfilePage = () => {
@@ -70,7 +70,6 @@ const ProfilePage = () => {
     setUploadingImage(true);
 
     try {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -120,6 +119,7 @@ const ProfilePage = () => {
 
   const diets = [
     { id: 'Pure veg', icon: <Leaf className="w-5 h-5 text-green-500" />, title: 'Pure veg', desc: 'Strictly vegetarian meals only' },
+    { id: 'Non-veg', icon: <Drumstick className="w-5 h-5 text-red-600" />, title: 'Non-veg', desc: 'Includes chicken, fish and mutton' },
     { id: 'Jain', icon: <Landmark className="w-5 h-5 text-orange-500" />, title: 'Jain', desc: 'No root vegetables, purely Satvic' },
     { id: 'No onion/garlic', icon: <HandPlatter className="w-5 h-5 text-gray-500" />, title: 'No onion/garlic', desc: 'Excludes all alliums from preparation' },
     { id: 'Diabetic-safe', icon: <Activity className="w-5 h-5 text-blue-500" />, title: 'Diabetic-safe', desc: 'Low glycemic index, controlled portions' },

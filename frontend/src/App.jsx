@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage'
 import SupportPage from './pages/SupportPage'
 import ProfilePage from './pages/ProfilePage'
 import DashboardPage from './pages/DashboardPage'
+import MealPlanPage from './pages/MealPlanPage'
+import DeliveriesPage from './pages/DeliveriesPage'
 
 function App() {
   return (
@@ -16,8 +18,8 @@ function App() {
         <Route path="/support" element={<SupportPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/meal-plans" element={<div className="flex items-center justify-center h-screen">Meal Plans Page (Coming Soon)</div>} />
-        <Route path="/deliveries" element={<div className="flex items-center justify-center h-screen">Deliveries Page (Coming Soon)</div>} />
+        <Route path="/meal-plans" element={<MealPlanPage />} />
+        <Route path="/deliveries" element={<DeliveriesPage />} />
       </Routes>
     </Router>
   )
