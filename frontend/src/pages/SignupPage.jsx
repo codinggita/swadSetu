@@ -1,16 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import signupBg from '../assets/signup-bg.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import signupBg from '../assets/signup-bg.png';
 import { setCredentials } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
 import api from '../services/api';
+import FormField from '../components/FormField';
+import { ChevronRight, ArrowLeft, Check } from 'lucide-react';
+
+const validationSchemas = [
+  Yup.object({
+    name: Yup.string().required('Full name is required').min(2, 'Name too short'),
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+  }),
+  Yup.object({
+    phone: Yup.string().matches(/^[0-9]{10}$/, 'Phone number must be 10 digits').required('Phone number is required'),
+  }),
+  Yup.object({
+    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
+  }),
+];
 
 const SignupPage = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   
   const dispatch = useDispatch();
@@ -25,13 +40,17 @@ const SignupPage = () => {
     }
   }, [navigate, userInfo]);
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  const handleSignup = async (values) => {
     setError('');
     dispatch(setLoading(true));
 
     try {
-      const { data } = await api.post('/users', { name, email, phone, password });
+      const { data } = await api.post('/users', { 
+        name: values.name, 
+        email: values.email, 
+        phone: values.phone, 
+        password: values.password 
+      });
       dispatch(setCredentials(data));
       navigate('/dashboard');
     } catch (err) {
@@ -41,6 +60,23 @@ const SignupPage = () => {
       dispatch(setLoading(false));
     }
   };
+
+  const nextStep = (validateForm, setTouched, currentValues) => {
+    validateForm().then((errors) => {
+      const stepFields = step === 1 ? ['name', 'email'] : ['phone'];
+      const stepErrors = Object.keys(errors).filter(key => stepFields.includes(key));
+      
+      if (stepErrors.length === 0) {
+        setStep(s => s + 1);
+      } else {
+        const touchedFields = {};
+        stepFields.forEach(f => touchedFields[f] = true);
+        setTouched(touchedFields);
+      }
+    });
+  };
+
+  const prevStep = () => setStep(s => s - 1);
 
   return (
     <div className="flex min-h-screen w-full bg-[#fffaf7] font-sans">
@@ -62,8 +98,24 @@ const SignupPage = () => {
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-15">
         <div className="w-full max-w-[400px]">
-          <h1 className="text-3xl font-bold mb-2 text-secondary">Join the table</h1>
-          <p className="text-sm text-text-light mb-10">Create your account to start your culinary journey.</p>
+          {/* Step Indicator */}
+          <div className="flex gap-2 mb-12">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex-1 flex flex-col gap-2">
+                <div className={`h-1 rounded-full transition-all duration-500 ${s <= step ? 'bg-orange-500' : 'bg-gray-100'}`}></div>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${s === step ? 'text-gray-900' : 'text-gray-300'}`}>
+                  {s === 1 ? 'Identity' : s === 2 ? 'Contact' : 'Security'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <h1 className="text-3xl font-bold mb-2 text-secondary">
+            {step === 1 ? 'Start your journey' : step === 2 ? 'Almost there' : 'One last step'}
+          </h1>
+          <p className="text-sm text-text-light mb-10">
+            {step === 1 ? 'Tell us who you are.' : step === 2 ? 'How can we reach you?' : 'Protect your account.'}
+          </p>
           
           {error && (
             <div className="bg-red-50 text-red-500 p-3 rounded-sm text-sm mb-6 border border-red-200">
@@ -71,81 +123,80 @@ const SignupPage = () => {
             </div>
           )}
           
-          <form className="space-y-5" onSubmit={handleSignup}>
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Full Name</label>
-              <input 
-                type="text" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Email Address</label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Phone Number</label>
-              <input 
-                type="tel" 
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 00000 00000" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Password</label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="********" 
-                className="p-3 border border-gray-200 rounded-sm text-sm outline-none focus:border-primary transition-colors bg-white"
-                required 
-              />
-            </div>
-            
-            <button 
-              type="submit" 
-              disabled={isLoading}
-              className="w-full bg-[#f26b1d] text-white p-3.5 rounded-sm text-base font-semibold flex items-center justify-center gap-2 hover:bg-[#e05a10] transition-colors mt-2 cursor-pointer disabled:opacity-70"
-            >
-              {isLoading ? 'Creating Account...' : 'Create Account'} <span className="text-lg">→</span>
-            </button>
-          </form>
+          <Formik
+            initialValues={{ name: '', email: '', phone: '', password: '', confirmPassword: '' }}
+            validationSchema={validationSchemas[step - 1]}
+            onSubmit={handleSignup}
+          >
+            {({ validateForm, setTouched, values }) => (
+              <Form className="space-y-6">
+                {step === 1 && (
+                  <>
+                    <FormField label="Full Name" name="name" type="text" placeholder="Enter your full name" />
+                    <FormField label="Email Address" name="email" type="email" placeholder="name@example.com" />
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
+                    <FormField label="Phone Number" name="phone" type="tel" placeholder="10-digit number" />
+                  </>
+                )}
+
+                {step === 3 && (
+                  <>
+                    <FormField label="Password" name="password" type="password" placeholder="********" />
+                    <FormField label="Confirm Password" name="confirmPassword" type="password" placeholder="********" />
+                  </>
+                )}
+
+                <div className="flex gap-4 pt-4">
+                  {step > 1 && (
+                    <button 
+                      type="button"
+                      onClick={prevStep}
+                      className="flex-[0.5] py-3.5 border border-gray-200 rounded-sm text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" /> Back
+                    </button>
+                  )}
+                  
+                  {step < 3 ? (
+                    <button 
+                      type="button"
+                      onClick={() => nextStep(validateForm, setTouched, values)}
+                      className="flex-1 bg-gray-900 text-white py-3.5 rounded-sm text-[11px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-xl shadow-gray-200"
+                    >
+                      Next Step <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <button 
+                      type="submit" 
+                      disabled={isLoading}
+                      className="flex-1 bg-[#f26b1d] text-white py-3.5 rounded-sm text-[11px] font-bold uppercase tracking-widest hover:bg-[#e05a10] transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-200 disabled:opacity-70"
+                    >
+                      {isLoading ? 'Creating Account...' : 'Complete Signup'} <Check className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </Form>
+            )}
+          </Formik>
           
-          <div className="flex items-center my-8 text-gray-300 text-[11px] font-bold tracking-widest">
+          <div className="flex items-center my-10 text-gray-300 text-[11px] font-bold tracking-widest">
             <div className="flex-1 border-b border-gray-100"></div>
-            <span className="px-3">OR CONTINUE WITH</span>
+            <span className="px-3 uppercase">Already a member?</span>
             <div className="flex-1 border-b border-gray-100"></div>
           </div>
           
-          <button className="w-full p-3 bg-white border border-gray-200 rounded-sm flex items-center justify-center gap-3 text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4.5 h-4.5" />
-            Continue with Google
-          </button>
+          <div className="text-center">
+            <Link to="/login" className="text-primary font-black uppercase text-[10px] tracking-widest hover:underline">
+              Log in to your account
+            </Link>
+          </div>
           
-          <p className="text-center mt-6 text-sm text-text-light">
-            Already have an account? <Link to="/login" className="text-primary font-bold">Log in</Link>
-          </p>
-          
-          <footer className="mt-12 text-[11px] text-gray-400 leading-relaxed text-center">
-            By creating an account, you agree to our <Link to="/terms" className="underline hover:text-gray-600">Terms of Service</Link> and <Link to="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>. Artisanal taste, delivered with care.
+          <footer className="mt-16 text-[10px] text-gray-400 leading-relaxed text-center font-medium">
+            By joining, you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/privacy" className="underline">Privacy</Link>.
           </footer>
         </div>
       </div>
