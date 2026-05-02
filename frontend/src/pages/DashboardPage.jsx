@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { 
@@ -8,11 +8,53 @@ import {
   ArrowRight,
   TrendingUp,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Heart,
+  X,
+  RefreshCw,
+  Check
 } from 'lucide-react';
 
 const DashboardPage = () => {
-  const [isSkipped, setIsSkipped] = React.useState(false);
+  const [isSkipped, setIsSkipped] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [deliveryTime, setDeliveryTime] = useState('1:00 PM');
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [activeBadge, setActiveBadge] = useState(null);
+  
+  const [swapsLeft, setSwapsLeft] = useState(3);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [mealIdxToSwap, setMealIdxToSwap] = useState(null);
+  
+  const [upcomingMeals, setUpcomingMeals] = useState([
+    { day: 'Tomorrow', menu: 'Butter Chicken & Naan', type: 'Dinner', time: '8:00 PM' },
+    { day: 'Wednesday', menu: 'Paneer Pulao & Raita', type: 'Lunch', time: '1:30 PM' },
+  ]);
+
+  const alternativeDishes = [
+    'Palak Paneer & Roti',
+    'Dal Makhani & Jeera Rice',
+    'Chole Bhature',
+    'Mutton Curry & Rice',
+    'Vegetable Biryani'
+  ];
+
+  const handleSwapClick = (idx) => {
+    if (swapsLeft > 0) {
+      setMealIdxToSwap(idx);
+      setIsSwapModalOpen(true);
+    } else {
+      alert("You have no swaps left this month! Upgrade to Pro for unlimited swaps.");
+    }
+  };
+
+  const confirmSwap = (newDish) => {
+    const updatedMeals = [...upcomingMeals];
+    updatedMeals[mealIdxToSwap] = { ...updatedMeals[mealIdxToSwap], menu: newDish };
+    setUpcomingMeals(updatedMeals);
+    setSwapsLeft(prev => prev - 1);
+    setIsSwapModalOpen(false);
+  };
   
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -20,11 +62,6 @@ const DashboardPage = () => {
     if (hour < 17) return 'Namaste';
     return 'Good Evening';
   };
-
-  const upcomingMeals = [
-    { day: 'Tomorrow', menu: 'Butter Chicken & Naan', type: 'Dinner', time: '8:00 PM' },
-    { day: 'Wednesday', menu: 'Paneer Pulao & Raita', type: 'Lunch', time: '1:30 PM' },
-  ];
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] text-gray-800 font-sans">
@@ -47,7 +84,7 @@ const DashboardPage = () => {
                 <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Your Benefits</p>
                 <ul className="text-xs text-gray-700 space-y-1 font-medium">
                   <li>• Daily artisan meals</li>
-                  <li>• 5 free swaps/month</li>
+                  <li>• 3 free swaps/month</li>
                   <li>• Priority support</li>
                 </ul>
               </div>
@@ -68,7 +105,7 @@ const DashboardPage = () => {
               </h1>
               <p className="text-gray-500 font-medium flex items-center gap-2">
                 <Clock className="w-4 h-4 text-orange-500" />
-                Next delivery: <span className="text-gray-900 font-bold">1:00 PM Today</span> from Annapurna Kitchen
+                Next delivery: <span className="text-gray-900 font-bold">{isSkipped ? 'Tomorrow' : `${deliveryTime} Today`}</span> from Annapurna Kitchen
               </p>
             </div>
             <div className="flex gap-3">
@@ -76,21 +113,24 @@ const DashboardPage = () => {
                 onClick={() => setIsSkipped(!isSkipped)}
                 className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                   isSkipped 
-                  ? 'bg-red-50 text-red-600 border border-red-100' 
+                  ? 'bg-red-50 text-red-600 border border-red-100 shadow-inner' 
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-500 hover:text-orange-600 shadow-sm'
                 }`}
               >
                 {isSkipped ? 'Meal Skipped' : 'Skip Today\'s Meal'}
               </button>
-              <button className="bg-orange-600 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-200 hover:bg-orange-700 hover:-translate-y-0.5 transition-all">
+              <button 
+                onClick={() => setIsScheduleModalOpen(true)}
+                className="bg-orange-600 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-200 hover:bg-orange-700 hover:-translate-y-0.5 transition-all"
+              >
                 Modify Schedule
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Left Main Content */}
-            <div className="lg:col-span-3 space-y-8">
+            <div className="lg:col-span-2 space-y-10">
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100/50 group hover:shadow-md transition-all">
@@ -104,9 +144,12 @@ const DashboardPage = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100/50 group hover:shadow-md transition-all">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Flexibility</h3>
-                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-ping"></div>
+                    <div className="flex gap-1">
+                      {[...Array(Math.max(0, swapsLeft))].map((_, i) => <Heart key={i} className="w-4 h-4 text-red-500 fill-red-500" />)}
+                      {[...Array(Math.max(0, 3 - swapsLeft))].map((_, i) => <Heart key={`empty-${i}`} className="w-4 h-4 text-gray-200" />)}
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-gray-900">2 Swaps Left</p>
+                  <p className="text-2xl font-black text-gray-900">{swapsLeft} Swaps Left</p>
                   <p className="text-[10px] text-gray-500 font-bold mt-2">Resets in 4 days</p>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100/50 group hover:shadow-md transition-all">
@@ -144,9 +187,24 @@ const DashboardPage = () => {
                       Slow-cooked yellow dal tadka, jeera rice, aloo gobhi matar, and two handmade whole wheat rotis.
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <span className="bg-gray-100 text-gray-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider">High Protein</span>
-                      <span className="bg-gray-100 text-gray-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider">Mild Spicy</span>
-                      <span className="bg-orange-50 text-orange-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider border border-orange-100">Most Popular</span>
+                      <button 
+                        onClick={() => { setActiveBadge('protein'); setIsInfoModalOpen(true); }}
+                        className="bg-gray-100 text-gray-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider hover:bg-orange-100 hover:text-orange-600 transition-all transform hover:-translate-y-0.5"
+                      >
+                        High Protein
+                      </button>
+                      <button 
+                        onClick={() => { setActiveBadge('spice'); setIsInfoModalOpen(true); }}
+                        className="bg-gray-100 text-gray-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider hover:bg-orange-100 hover:text-orange-600 transition-all transform hover:-translate-y-0.5"
+                      >
+                        Mild Spicy
+                      </button>
+                      <button 
+                        onClick={() => { setActiveBadge('popular'); setIsInfoModalOpen(true); }}
+                        className="bg-orange-50 text-orange-600 text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-wider border border-orange-100 hover:bg-orange-600 hover:text-white transition-all transform hover:-translate-y-0.5"
+                      >
+                        Most Popular
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -191,42 +249,45 @@ const DashboardPage = () => {
 
             {/* Right Column: Upcoming & Discovery */}
             <div className="space-y-8">
-              <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center justify-between">
-                  Upcoming Meals
-                  <span className="text-[10px] text-orange-500 font-bold lowercase hover:underline cursor-pointer">see all</span>
-                </h3>
-                <div className="space-y-6">
+              <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-orange-500/5 relative group/card overflow-hidden">
+                {/* Accent Line */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 to-orange-600 opacity-80"></div>
+                
+                <div className="flex items-center justify-between mb-8 relative z-10">
+                  <h3 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Upcoming Schedule</h3>
+                  <button className="text-[10px] font-black text-orange-500 uppercase tracking-widest hover:text-orange-600 transition-colors">View All</button>
+                </div>
+                
+                <div className="space-y-0 relative">
+                  {/* Timeline Line */}
+                  <div className="absolute left-6 top-2 bottom-2 w-px bg-gray-100"></div>
+                  
                   {upcomingMeals.map((meal, idx) => (
-                    <div key={idx} className="flex gap-4 group cursor-pointer">
-                      <div className="w-12 h-12 bg-gray-50 rounded-2xl flex flex-col items-center justify-center border border-gray-100 group-hover:border-orange-200 transition-colors">
-                        <span className="text-[10px] font-black text-gray-400 uppercase leading-none mb-1">{meal.day.substring(0,3)}</span>
-                        <span className="text-xs font-black text-gray-900">{idx + 1}</span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-black text-gray-900 group-hover:text-orange-600 transition-colors">{meal.menu}</p>
-                        <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-wider">{meal.type} • {meal.time}</p>
+                    <div key={idx} className="relative pl-12 pb-8 last:pb-0 group/item">
+                      {/* Timeline Dot */}
+                      <div className="absolute left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-white border-2 border-gray-200 z-10 group-hover/item:border-orange-500 group-hover/item:scale-125 transition-all duration-300"></div>
+                      
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{meal.day} • {meal.time}</span>
+                          <button 
+                            onClick={() => handleSwapClick(idx)}
+                            className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:shadow-emerald-200 transition-all transform hover:-translate-y-0.5 active:scale-95 group/swap"
+                          >
+                            Swap Meal <RefreshCw className="w-3 h-3 group-hover/swap:rotate-180 transition-transform duration-500" />
+                          </button>
+                        </div>
+                        <h4 className="text-sm font-black text-gray-900 group-hover/item:text-orange-600 transition-colors">{meal.menu}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{meal.type}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-[#121212] rounded-3xl p-8 text-white relative overflow-hidden group cursor-pointer">
-                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
-                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=500" className="w-full h-full object-cover" />
-                </div>
-                <div className="relative z-10">
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mb-6">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                  <h4 className="text-lg font-black mb-2">Upgrade to Pro</h4>
-                  <p className="text-gray-400 text-xs font-medium mb-6 leading-relaxed">Unlock unlimited meal swaps and weekend artisan specials.</p>
-                  <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500 group-hover:gap-3 transition-all">
-                    Explore Plans <ArrowUpRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -276,6 +337,172 @@ const DashboardPage = () => {
           </footer>
         </main>
       </div>
+
+      {/* Swap Modal */}
+      {isSwapModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-black text-gray-900">Swap Your Meal</h2>
+                <p className="text-xs font-bold text-gray-500 mt-1 flex items-center gap-1">
+                  Costs 1 <Heart className="w-3 h-3 text-red-500 fill-red-500" /> • {swapsLeft} remaining
+                </p>
+              </div>
+              <button onClick={() => setIsSwapModalOpen(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100 mb-6">
+              <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">Replacing</p>
+              <p className="text-sm font-bold text-gray-900">{upcomingMeals[mealIdxToSwap]?.menu}</p>
+            </div>
+            
+            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Select Alternative</h3>
+            
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+              {alternativeDishes.map((dish, i) => (
+                <div 
+                  key={i}
+                  onClick={() => confirmSwap(dish)}
+                  className="p-4 rounded-xl border border-gray-100 flex justify-between items-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all group"
+                >
+                  <span className="text-sm font-bold text-gray-700 group-hover:text-orange-600">{dish}</span>
+                  <div className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center group-hover:bg-orange-500 group-hover:border-orange-500 transition-colors">
+                    <Check className="w-3 h-3 text-white opacity-0 group-hover:opacity-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => setIsSwapModalOpen(false)}
+              className="w-full mt-6 py-3 bg-gray-50 text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Modal */}
+      {isScheduleModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-black text-gray-900">Modify Schedule</h2>
+                <p className="text-xs font-bold text-gray-500 mt-1">Select your preferred delivery time</p>
+              </div>
+              <button onClick={() => setIsScheduleModalOpen(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {['11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM'].map((time) => (
+                <div 
+                  key={time}
+                  onClick={() => {
+                    setDeliveryTime(time);
+                    setIsScheduleModalOpen(false);
+                  }}
+                  className={`p-4 rounded-xl border flex justify-between items-center cursor-pointer transition-all group ${
+                    deliveryTime === time 
+                    ? 'border-orange-500 bg-orange-50' 
+                    : 'border-gray-100 hover:border-orange-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className={`text-sm font-bold ${deliveryTime === time ? 'text-orange-600' : 'text-gray-700'}`}>{time}</span>
+                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                    deliveryTime === time 
+                    ? 'bg-orange-500 border-orange-500' 
+                    : 'border-gray-200 group-hover:border-orange-300'
+                  }`}>
+                    <Check className={`w-3 h-3 text-white ${deliveryTime === time ? 'opacity-100' : 'opacity-0'}`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => setIsScheduleModalOpen(false)}
+              className="w-full mt-6 py-3 bg-gray-50 text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Meal Insights Modal */}
+      {isInfoModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-sm p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Meal Insights</h2>
+              <button onClick={() => setIsInfoModalOpen(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {activeBadge === 'protein' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center">
+                  <p className="text-4xl font-black text-blue-600 mb-1">28g</p>
+                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Total Protein</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Primary Sources</p>
+                  <ul className="text-sm font-black text-gray-800 space-y-1">
+                    <li>• Slow-cooked Yellow Dal</li>
+                    <li>• Handmade Whole Wheat Roti</li>
+                    <li>• Fresh Aloo Gobhi Matar</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
+            {activeBadge === 'spice' && (
+              <div className="space-y-6">
+                <div className="flex justify-center gap-2">
+                  {[1, 2].map(i => <Flame key={i} className="w-8 h-8 text-orange-500 fill-orange-500" />)}
+                  {[3, 4, 5].map(i => <Flame key={i} className="w-8 h-8 text-gray-200" />)}
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-black text-gray-900">Mild Heat Level</p>
+                  <p className="text-xs font-medium text-gray-500 mt-2 leading-relaxed">
+                    Balanced using Kashmiri red chilies for color and mild warmth, without the intense heat.
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {activeBadge === 'popular' && (
+              <div className="space-y-6">
+                <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100 text-center">
+                  <div className="flex justify-center gap-1 mb-2">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-orange-500 fill-orange-500" />)}
+                  </div>
+                  <p className="text-2xl font-black text-gray-900">4.9/5 Rating</p>
+                  <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mt-1">Based on 1,200+ orders</p>
+                </div>
+                <p className="text-xs font-medium text-gray-500 text-center leading-relaxed italic">
+                  "The Dal Tadka tastes exactly like home. Best thali in the city!"
+                </p>
+              </div>
+            )}
+            
+            <button 
+              onClick={() => setIsInfoModalOpen(false)}
+              className="w-full mt-8 py-3 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

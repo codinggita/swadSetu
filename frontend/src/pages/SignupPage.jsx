@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import signupBg from '../assets/signup-bg.png';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,13 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
