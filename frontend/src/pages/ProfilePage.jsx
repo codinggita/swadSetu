@@ -8,6 +8,7 @@ import {
 import { setCredentials } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
 import { setProfile } from '../store/slices/userSlice';
+import api from '../services/api';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -42,23 +43,13 @@ const ProfilePage = () => {
         }
 
         dispatch(setLoading(true));
-        const res = await fetch('/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          dispatch(setProfile(data));
-          setEditName(data.name);
-          setEditEmail(data.email);
-          setEditPhone(data.phone || '');
-          setImagePreview(data.profileImage || '');
-        } else {
-          dispatch(setCredentials(null));
-          navigate('/login');
-        }
+        const { data } = await api.get('/users/profile');
+        
+        dispatch(setProfile(data));
+        setEditName(data.name);
+        setEditEmail(data.email);
+        setEditPhone(data.phone || '');
+        setImagePreview(data.profileImage || '');
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {
@@ -76,19 +67,12 @@ const ProfilePage = () => {
     setUploadingImage(true);
 
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const { data } = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setImagePreview(data.image);
-      } else {
-        console.error('Image upload failed');
-      }
+      setImagePreview(data.image);
     } catch (error) {
-      console.error(error);
+      console.error('Image upload failed', error);
     } finally {
       setUploadingImage(false);
     }
@@ -97,26 +81,16 @@ const ProfilePage = () => {
   const submitProfileHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-        body: JSON.stringify({
-          name: editName,
-          email: editEmail,
-          phone: editPhone,
-          profileImage: imagePreview,
-        }),
+      const { data } = await api.put('/users/profile', {
+        name: editName,
+        email: editEmail,
+        phone: editPhone,
+        profileImage: imagePreview,
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        dispatch(setProfile(data));
-        dispatch(setCredentials({ ...userInfo, ...data }));
-        setIsEditing(false);
-      }
+      dispatch(setProfile(data));
+      dispatch(setCredentials({ ...userInfo, ...data }));
+      setIsEditing(false);
     } catch (error) {
       console.error('Profile update failed', error);
     }

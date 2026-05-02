@@ -4,6 +4,7 @@ import signupBg from '../assets/signup-bg.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { setCredentials } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
+import api from '../services/api';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -30,24 +31,11 @@ const SignupPage = () => {
     dispatch(setLoading(true));
 
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, phone, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        dispatch(setCredentials(data));
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Signup failed. Please try again.');
-      }
+      const { data } = await api.post('/users', { name, email, phone, password });
+      dispatch(setCredentials(data));
+      navigate('/dashboard');
     } catch (err) {
-      setError('An error occurred while connecting to the server.');
+      setError(err.customMessage || 'Signup failed. Please try again.');
       console.error('Signup error:', err);
     } finally {
       dispatch(setLoading(false));
