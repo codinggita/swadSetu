@@ -5,7 +5,8 @@ import {
   UtensilsCrossed, 
   Truck, 
   Settings, 
-  HelpCircle 
+  HelpCircle,
+  User
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -15,7 +16,8 @@ const Sidebar = () => {
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
     { name: 'Meal Plans', icon: <UtensilsCrossed className="w-5 h-5" />, path: '/meal-plans' },
     { name: 'Deliveries', icon: <Truck className="w-5 h-5" />, path: '/deliveries' },
-    { name: 'Preferences', icon: <Settings className="w-5 h-5" />, path: '/profile' },
+    { name: 'Profile', icon: <User className="w-5 h-5" />, path: '/profile' },
+    { name: 'Preferences', icon: <Settings className="w-5 h-5" />, path: '/preferences' },
     { name: 'Support', icon: <HelpCircle className="w-5 h-5" />, path: '/support' },
   ];
 
