@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Info, CheckCircle, Leaf, Landmark, Activity, Flame, Monitor, 
-  Plus, X, Bell, User, HandPlatter, Camera, Edit3, Loader, Drumstick
+  User, Camera, Edit3, Loader, X, Mail, Phone, Shield, ExternalLink, MapPin
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
+import Sidebar from '../components/Sidebar';
 import { setCredentials } from '../store/slices/authSlice';
 import { setLoading } from '../store/slices/uiSlice';
 import { setProfile } from '../store/slices/userSlice';
@@ -27,13 +27,6 @@ const ProfilePage = () => {
   const [imagePreview, setImagePreview] = useState('');
   
   const navigate = useNavigate();
-
-  // Preferences state
-  const [selectedDiet, setSelectedDiet] = useState('Pure veg');
-  const [spiciness, setSpiciness] = useState('Medium');
-  const [oilLevel, setOilLevel] = useState(50);
-  const [tiffinTime, setTiffinTime] = useState('11am-1pm');
-  const [avoidItems, setAvoidItems] = useState(['Peanuts', 'Dairy', 'Shellfish', 'Gluten', 'Mustard', 'Sesame']);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -97,289 +90,200 @@ const ProfilePage = () => {
     }
   };
 
-  const diets = [
-    { id: 'Pure veg', icon: <Leaf className="w-5 h-5 text-green-500" />, title: 'Pure veg', desc: 'Strictly vegetarian meals only' },
-    { id: 'Non-veg', icon: <Drumstick className="w-5 h-5 text-red-600" />, title: 'Non-veg', desc: 'Includes chicken, fish and mutton' },
-    { id: 'Jain', icon: <Landmark className="w-5 h-5 text-orange-500" />, title: 'Jain', desc: 'No root vegetables, purely Satvic' },
-    { id: 'No onion/garlic', icon: <HandPlatter className="w-5 h-5 text-gray-500" />, title: 'No onion/garlic', desc: 'Excludes all alliums from preparation' },
-    { id: 'Diabetic-safe', icon: <Activity className="w-5 h-5 text-blue-500" />, title: 'Diabetic-safe', desc: 'Low glycemic index, controlled portions' },
-    { id: 'High protein', icon: <Flame className="w-5 h-5 text-red-500" />, title: 'High protein', desc: 'Extra legumes, paneer and soy proteins' },
-    { id: 'Low calorie', icon: <Monitor className="w-5 h-5 text-purple-500" />, title: 'Low calorie', desc: 'Optimized for weight management' },
-  ];
-
-  const spicinessLevels = ['No spice', 'Mild', 'Medium', 'Spicy', 'Extra hot'];
-  const tiffinTimes = ['Before 11am', '11am-1pm', '1pm-3pm', 'After 3pm'];
-
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]"><Loader className="w-8 h-8 text-orange-500 animate-spin" /></div>;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 transition-colors duration-300">
-      {/* Navbar */}
-      <nav className="bg-white dark:bg-[#0f0f0f] border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex justify-between items-center transition-colors">
-        <div className="flex items-center gap-2">
-          <Link to="/" className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">SwadSetu<span className="text-orange-500">.</span></Link>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500 dark:text-gray-400">
-          <Link to="/" className="hover:text-gray-900 dark:hover:text-white transition-colors">Home</Link>
-          <Link to="/menu" className="hover:text-gray-900 dark:hover:text-white transition-colors">Menu</Link>
-          <Link to="/dashboard" className="hover:text-gray-900 dark:hover:text-white transition-colors">Dashboard</Link>
-          <Link to="/profile" className="text-gray-900 dark:text-white border-b-2 border-orange-500 pb-1">Profile</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <button className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-orange-700 transition-colors">Go Premium</button>
-          <Bell className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-white" />
-          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white overflow-hidden cursor-pointer">
-            {user?.profileImage ? (
-              <img src={`/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
-            ) : (
-              <User className="w-5 h-5" />
-            )}
-          </div>
-        </div>
-      </nav>
+    <div className="flex min-h-screen bg-[#f8f9fa] dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
+      <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 bg-white dark:bg-gray-950 w-full p-6 md:p-12 shadow-inner transition-colors duration-300">
-        <div className="w-full mx-auto max-w-[1600px]">
-          
-          {/* Personal Information Section */}
-          <div className="bg-orange-50 dark:bg-orange-500/5 border border-orange-100 dark:border-orange-500/10 rounded-2xl p-8 mb-10 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden transition-colors">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-200/40 dark:bg-orange-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-            
-            <div className="relative z-10 w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0">
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-[#121212] dark:bg-[#000000] px-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
+            <span className="text-xl font-bold text-white tracking-tight">Your Profile</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white overflow-hidden cursor-pointer">
               {user?.profileImage ? (
-                <img src={`/api${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
+                <img src={`/api${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-12 h-12 text-gray-400" />
+                <User className="w-5 h-5" />
               )}
             </div>
-            
-            <div className="relative z-10 flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{user?.name}</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">{user?.email}</p>
-              {user?.phone && <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">{user.phone}</p>}
-            </div>
-            
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="relative z-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
-            >
-              <Edit3 className="w-4 h-4" /> Edit Profile
-            </button>
           </div>
+        </header>
 
-          {/* Edit Profile Modal */}
-          {isEditing && (
-            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
-                  <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                    <X className="w-5 h-5" />
+        {/* Content */}
+        <main className="p-8 md:p-12 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
+            {/* Hero Profile Card */}
+            <div className="bg-white dark:bg-[#121212] rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden transition-all duration-300">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
+                <div className="relative group">
+                  <div className="w-32 h-32 rounded-[2rem] bg-gray-50 dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-2xl flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-105">
+                    {user?.profileImage ? (
+                      <img src={`/api${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" onError={(e) => e.target.src = user.profileImage} />
+                    ) : (
+                      <User className="w-12 h-12 text-gray-300" />
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="absolute -bottom-2 -right-2 bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:bg-orange-700 transition-all active:scale-90"
+                  >
+                    <Camera className="w-4 h-4" />
                   </button>
                 </div>
                 
-                <form onSubmit={submitProfileHandler} className="space-y-5">
-                  <div className="flex justify-center mb-6">
-                    <div className="relative group">
-                      <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors">
-                        {imagePreview ? (
-                          <img src={imagePreview.startsWith('http') ? imagePreview : `/api${imagePreview}`} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.src = imagePreview} />
-                        ) : (
-                          <User className="w-8 h-8 text-gray-400" />
-                        )}
-                      </div>
-                      <label className="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
-                        {uploadingImage ? (
-                          <Loader className="w-6 h-6 animate-spin mb-1" />
-                        ) : (
-                          <>
-                            <Camera className="w-6 h-6 mb-1" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Change</span>
-                          </>
-                        )}
-                        <input type="file" onChange={uploadFileHandler} className="hidden" accept="image/*" />
-                      </label>
-                    </div>
+                <div className="flex-1 text-center md:text-left pt-2">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                    <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter">{user?.name}</h1>
+                    <span className="inline-flex bg-orange-500/10 text-orange-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest self-center md:self-auto border border-orange-500/20">Active Member</span>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Full Name</label>
-                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full p-2.5 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:border-orange-500 outline-none bg-white dark:bg-gray-800 dark:text-white transition-colors" required />
+                  <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <Mail className="w-4 h-4" />
+                      <span className="text-sm font-bold">{user?.email}</span>
                     </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
-                      <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full p-2.5 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:border-orange-500 outline-none bg-white dark:bg-gray-800 dark:text-white transition-colors" required />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone Number</label>
-                      <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="w-full p-2.5 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:border-orange-500 outline-none bg-white dark:bg-gray-800 dark:text-white transition-colors" />
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3 mt-8">
-                    <button type="button" onClick={() => setIsEditing(false)} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-                    <button type="submit" className="flex-1 py-2.5 bg-orange-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-orange-700 transition-colors">Save Changes</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Preferences Header */}
-          <div className="flex justify-between items-start mb-6 border-t border-gray-100 dark:border-gray-800 pt-10 transition-colors">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dietary Preferences</h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">These global settings apply to all your delivery centers automatically.</p>
-            </div>
-            <div className="flex items-center gap-2 bg-green-50 dark:bg-green-500/10 px-3 py-1.5 rounded-full border border-green-100 dark:border-green-500/20 transition-colors">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-700 dark:text-green-400 text-xs font-semibold">All centers synced</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column: What do you eat? */}
-            <div className="border border-gray-100 rounded-xl p-6 bg-gray-50/50">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">What do you eat?</h2>
-                  <p className="text-gray-500 text-xs">Applied to all centers</p>
-                </div>
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-md">{selectedDiet} selected</span>
-              </div>
-
-              <div className="space-y-3">
-                {diets.map((diet) => (
-                  <div 
-                    key={diet.id}
-                    onClick={() => setSelectedDiet(diet.id)}
-                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
-                      selectedDiet === diet.id 
-                      ? 'bg-white dark:bg-gray-900 border-orange-500 shadow-sm' 
-                      : 'bg-white/50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700'
-                    }`}
-                  >
-                    <div className={`p-2 rounded-lg ${selectedDiet === diet.id ? 'bg-orange-50 dark:bg-orange-500/10' : 'bg-gray-100 dark:bg-gray-800'}`}>
-                      {diet.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{diet.title}</h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{diet.desc}</p>
-                    </div>
-                    {selectedDiet === diet.id && (
-                      <div className="ml-auto">
-                        <CheckCircle className="w-5 h-5 text-orange-500" />
+                    {user?.phone && (
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <Phone className="w-4 h-4" />
+                        <span className="text-sm font-bold">{user.phone}</span>
                       </div>
                     )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              {/* Spiciness */}
-              <div className="border border-gray-100 dark:border-gray-800 rounded-xl p-6 bg-gray-50/50 dark:bg-gray-900/30 transition-colors">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How spicy do you like it?</h2>
-                <div className="flex flex-wrap gap-2">
-                  {spicinessLevels.map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSpiciness(level)}
-                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                        spiciness === level
-                        ? 'bg-orange-500 text-white shadow-md'
-                        : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-8">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-6">Oil quantity</h3>
-                  <div className="relative pt-1 px-2">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="100" 
-                      value={oilLevel}
-                      onChange={(e) => setOilLevel(e.target.value)}
-                      className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-                    />
-                    <div className="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                      <span>Less</span>
-                      <span>Normal</span>
-                      <span>Extra</span>
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm font-bold">Bangalore, IN</span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Tiffin Time */}
-              <div className="border border-gray-100 rounded-xl p-6 bg-gray-50/50">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">When do you want your tiffin?</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {tiffinTimes.map((time) => (
-                    <div
-                      key={time}
-                      onClick={() => setTiffinTime(time)}
-                      className={`p-3 rounded-lg border text-center cursor-pointer transition-all ${
-                        tiffinTime === time
-                        ? 'bg-white border-orange-500 text-orange-600 shadow-sm font-bold'
-                        : 'bg-white border-gray-100 text-gray-600 font-medium'
-                      }`}
-                    >
-                      <span className="text-xs">{time}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Advance meal lock time</span>
-                    <span className="font-bold text-orange-600">10:00 pm</span>
+            {/* Account Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+              {/* Security Card */}
+              <div className="bg-white dark:bg-[#121212] rounded-[2rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm transition-colors">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
+                    <Shield className="w-5 h-5" />
                   </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Default if not customized</span>
-                    <span className="font-bold text-orange-600">Chef's choice</span>
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Security</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Password</span>
+                    <button className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:underline">Change</button>
+                  </div>
+                  <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Two-Factor Auth</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Disabled</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Status */}
+              <div className="bg-white dark:bg-[#121212] rounded-[2rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm transition-colors">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center text-green-500">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Subscription</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Plan Type</span>
+                    <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest">Standard Monthly</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Next Billing</span>
+                    <span className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">May 24, 2024</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Things to Avoid */}
-          <div className="mt-8 border border-gray-100 rounded-xl p-6 bg-gray-50/50">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Things to avoid</h2>
-            <div className="flex flex-wrap gap-2">
-              {avoidItems.map((item) => (
-               <div key={item} className="flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-1.5 rounded-md border border-orange-100 text-xs font-semibold">
-                 {item}
-                 <X 
-                   className="w-3 h-3 cursor-pointer hover:text-orange-900" 
-                   onClick={() => setAvoidItems(avoidItems.filter(i => i !== item))}
-                 />
-               </div>
-              ))}
-              <button className="flex items-center gap-2 bg-white border border-dashed border-gray-300 px-4 py-1.5 rounded-md text-xs font-semibold text-gray-500 hover:border-gray-400 hover:text-gray-600">
-                <Plus className="w-3 h-3" />
-                Add item
+            {/* Quick Actions */}
+            <div className="mt-8 bg-[#121212] dark:bg-[#000000] rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 transition-colors shadow-2xl">
+              <div>
+                <h3 className="text-xl font-black tracking-tight mb-1">Upgrade to Premium</h3>
+                <p className="text-gray-400 text-xs font-medium">Get unlimited meal swaps, zero delivery fees, and priority support.</p>
+              </div>
+              <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group">
+                Learn More <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
-
-          <div className="mt-10 flex items-center justify-end gap-4">
-            <button className="bg-orange-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all">
-              Save preferences
-            </button>
-          </div>
-
-        </div>
+        </main>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-[#121212] rounded-[3rem] w-full max-w-lg p-10 shadow-2xl relative overflow-hidden transition-colors">
+            <div className="absolute top-0 left-0 w-full h-2 bg-orange-600"></div>
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Edit Profile</h2>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">Update your personal details</p>
+              </div>
+              <button onClick={() => setIsEditing(false)} className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={submitProfileHandler} className="space-y-8">
+              <div className="flex justify-center">
+                <div className="relative group">
+                  <div className="w-28 h-28 rounded-[2rem] border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors">
+                    {imagePreview ? (
+                      <img src={imagePreview.startsWith('http') ? imagePreview : `/api${imagePreview}`} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.src = imagePreview} />
+                    ) : (
+                      <User className="w-10 h-10 text-gray-300" />
+                    )}
+                  </div>
+                  <label className="absolute inset-0 bg-black/60 rounded-[2rem] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                    {uploadingImage ? (
+                      <Loader className="w-6 h-6 animate-spin mb-1" />
+                    ) : (
+                      <>
+                        <Camera className="w-6 h-6 mb-1" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Upload</span>
+                      </>
+                    )}
+                    <input type="file" onChange={uploadFileHandler} className="hidden" accept="image/*" />
+                  </label>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Full Name</label>
+                  <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-orange-500/20 outline-none text-sm font-bold text-gray-900 dark:text-white transition-all" placeholder="John Doe" required />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Email Address</label>
+                  <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-orange-500/20 outline-none text-sm font-bold text-gray-900 dark:text-white transition-all" placeholder="john@example.com" required />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Phone Number</label>
+                  <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-orange-500/20 outline-none text-sm font-bold text-gray-900 dark:text-white transition-all" placeholder="+91 9876543210" />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <button type="button" onClick={() => setIsEditing(false)} className="flex-1 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">Cancel</button>
+                <button type="submit" className="flex-1 py-4 rounded-2xl bg-orange-600 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:bg-orange-700 transition-all">Save Profile</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
