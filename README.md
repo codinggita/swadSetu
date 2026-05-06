@@ -6,9 +6,7 @@
 
 ## 📸 App Preview
 
-![swadSetu Dashboard Preview](https://raw.githubusercontent.com/sumit22102006/swadSetu/main/preview.png)
-
-> **Tip:** Take a screenshot of [the live app](https://swad-setu.vercel.app/dashboard), save it as `preview.png` in the root of your repo, and the image above will render automatically.
+![swadSetu Dashboard Preview](./frontend/src/assets/preview.png.png)
 
 ---
 

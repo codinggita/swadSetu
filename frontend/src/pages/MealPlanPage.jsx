@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { API_URL } from '../services/api';
-import { MapPin, ChevronLeft, ChevronRight, CalendarX, Plus } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight, CalendarX, Plus, Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { User, Star } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
@@ -11,6 +11,7 @@ import SEO from '../components/SEO';
 const MealPlanPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const getDaysOfWeek = (baseDate) => {
     const date = new Date(baseDate);
@@ -117,7 +118,7 @@ const MealPlanPage = () => {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
       <SEO title="Meal Plan" url="/meal-plans" />
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       <div className="flex-1 flex flex-col relative">
         
         {toastMessage && (
@@ -127,8 +128,15 @@ const MealPlanPage = () => {
           </div>
         )}
         {/* Header from Dashboard for consistency */}
-        <header className="bg-[#121212] dark:bg-[#000000] pl-16 xl:pl-8 pr-4 sm:pr-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
+        <header className="bg-[#121212] dark:bg-[#000000] px-4 sm:px-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="xl:hidden p-2 rounded-xl hover:bg-white/10 text-gray-300 transition-colors"
+              aria-label="Open sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
             <span className="text-xl font-bold text-white tracking-tight">swadSetu</span>
           </div>
