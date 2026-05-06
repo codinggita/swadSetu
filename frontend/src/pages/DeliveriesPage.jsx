@@ -17,7 +17,8 @@ import {
   Navigation,
   X,
   Maximize2,
-  LocateFixed
+  LocateFixed,
+  Menu
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import { Search, Loader, ArrowLeft } from 'lucide-react';
@@ -82,6 +83,7 @@ const DeliveriesPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Use redux currentAddress if available, otherwise first address as fallback
   const currentAddress = reduxCurrentAddress || addresses[0];
@@ -222,12 +224,19 @@ const DeliveriesPage = () => {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
       <SEO title="Track Deliveries" url="/deliveries" />
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-[#121212] dark:bg-[#000000] pl-16 lg:pl-8 pr-4 sm:pr-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
+        <header className="bg-[#121212] dark:bg-[#000000] px-4 sm:px-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="xl:hidden p-2 rounded-xl hover:bg-white/10 text-gray-300 transition-colors"
+              aria-label="Open sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
             <span className="text-xl font-bold text-white tracking-tight">swadSetu</span>
           </div>
@@ -248,15 +257,15 @@ const DeliveriesPage = () => {
         </header>
 
         {/* Main Content */}
-        <main className="p-4 sm:p-8 lg:p-12 max-w-6xl w-full mx-auto">
+        <main className="p-4 sm:p-8 xl:p-12 max-w-6xl w-full mx-auto">
           <div className="mb-12">
             <h1 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">Deliveries</h1>
             <p className="text-gray-500 dark:text-gray-400 font-medium transition-colors">Track your active meals and view order history.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-10">
             {/* Left Column: Active Tracking */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="xl:col-span-2 space-y-8">
               {/* Active Delivery Card */}
               <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
                 <div className="p-8 border-b border-gray-50 dark:border-gray-800 flex justify-between items-center">
