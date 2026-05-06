@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { API_URL } from '../services/api';
 import { 
   Truck, 
   MapPin, 
@@ -76,6 +77,7 @@ const LocationPicker = ({ onLocationSelect }) => {
 const DeliveriesPage = () => {
   const dispatch = useDispatch();
   const { addresses, currentAddress: reduxCurrentAddress } = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.auth);
   
   const [activeTab, setActiveTab] = useState('all');
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -224,31 +226,35 @@ const DeliveriesPage = () => {
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-[#121212] dark:bg-[#000000] px-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
+        <header className="bg-[#121212] dark:bg-[#000000] pl-16 lg:pl-8 pr-4 sm:pr-8 py-4 flex justify-between items-center sticky top-0 z-40 shadow-xl transition-colors">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
             <span className="text-xl font-bold text-white tracking-tight">swadSetu</span>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-full text-[10px] font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-6">
+            <div className="hidden sm:flex bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-full text-[10px] font-bold text-orange-400 uppercase tracking-widest items-center gap-2">
               <Star className="w-3 h-3 fill-orange-400" />
               Standard Plan
             </div>
             <ThemeToggle />
             <Link to="/profile" className="w-9 h-9 bg-gradient-to-tr from-orange-500 to-orange-400 rounded-full flex items-center justify-center text-white cursor-pointer overflow-hidden ring-2 ring-gray-800 hover:ring-orange-500/50 transition-all">
-              <User className="w-5 h-5" />
+              {userInfo?.profileImage ? (
+                <img src={`${API_URL}/api${userInfo.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
             </Link>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="p-8 lg:p-12 max-w-6xl w-full mx-auto">
+        <main className="p-4 sm:p-8 lg:p-12 max-w-6xl w-full mx-auto">
           <div className="mb-12">
-            <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">Deliveries</h1>
+            <h1 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">Deliveries</h1>
             <p className="text-gray-500 dark:text-gray-400 font-medium transition-colors">Track your active meals and view order history.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
             {/* Left Column: Active Tracking */}
             <div className="lg:col-span-2 space-y-8">
               {/* Active Delivery Card */}
@@ -463,12 +469,12 @@ const DeliveriesPage = () => {
           </div>
 
           {/* Footer */}
-          <footer className="mt-32 pt-12 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-8 text-gray-400 text-[10px] font-bold pb-20 transition-colors">
-            <div className="flex items-center gap-10">
+          <footer className="mt-16 md:mt-32 pt-8 md:pt-12 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 text-gray-400 text-[10px] font-bold pb-10 md:pb-20 transition-colors">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-10 text-center sm:text-left">
               <span className="text-gray-900 dark:text-white text-sm font-black tracking-tight">swadSetu<span className="text-orange-500">.</span></span>
               <span className="font-medium text-gray-400 dark:text-gray-500">© 2024 SwadSetu. Built for honesty and clarity.</span>
             </div>
-            <div className="flex gap-8 uppercase tracking-widest">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-8 uppercase tracking-widest">
               <Link to="/support" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Help Center</Link>
               <Link to="/privacy" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Privacy Policy</Link>
               <Link to="/contact" className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">Contact Us</Link>
